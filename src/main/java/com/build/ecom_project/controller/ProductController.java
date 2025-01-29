@@ -50,12 +50,13 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/{productId}/image")
+    @GetMapping("/products/{productId}/image")
     public ResponseEntity<byte[]> getImageByProductId(@PathVariable int productId){
         Product product = service.getProductsById(productId);
         byte[] imageFile = product.getImageDate();
 
         return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(product.getImageType()))
                  .body(imageFile);
     }
 
@@ -75,9 +76,24 @@ public class ProductController {
                 return new ResponseEntity<>("Failed to update", HttpStatus.BAD_REQUEST);
     }
 
-    //DElete code
+    //Delete code
+@DeleteMapping("/products/{id}")
 
+    public ResponseEntity<String> deleteProduct(@PathVariable int id){
+        Product product = service.getProductsById(id);
+        if(product != null){
+            service.deleteProduct(id);
+            return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        }else
+            return new ResponseEntity<>("Product Not Found", HttpStatus.NOT_FOUND);
+}
 
+    //for search method
+    @GetMapping("/products/search")
+    public ResponseEntity<List<Product>> searchProducts(@RequestParam String keyword){
+        List<Product> products =  service.searchProducts(keyword);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
 
 }
 
