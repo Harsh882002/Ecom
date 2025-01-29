@@ -4,32 +4,39 @@ import com.build.ecom_project.model.Product;
 import com.build.ecom_project.repo.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 
 public class ProductService {
-@Autowired
+    @Autowired
     private ProductRepo repo;
 
-//to fetch all element
+    //to fetch all element
     public List<Product> getAllProducts() {
         return repo.findAll();
     }
 
     //to fetch single element
     public Product getProductsById(int id) {
-        return repo.findById(id).orElseGet(
-                () -> {
-                    Product notFoundProduct = new Product();
-                    notFoundProduct.setName("Not Found");
-                    return notFoundProduct;
-                }
+        return repo.findById(id).get();
+    }
 
+    //    to Add data into database
+//    public Product testAddProduct(Product product) {
+//        return repo.save(product);
+//    }
 
-        );
+    public Product addProduct(Product product, MultipartFile imageFile) throws IOException{
+        product.setImageName(imageFile.getOriginalFilename());
+        product.setImageType(imageFile.getContentType());
+        product.setImageDate(imageFile.getBytes());
+        return repo.save(product);
     }
 
 
